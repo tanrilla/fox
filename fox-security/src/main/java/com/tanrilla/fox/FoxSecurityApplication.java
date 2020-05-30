@@ -2,14 +2,11 @@ package com.tanrilla.fox;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,12 +83,6 @@ public class FoxSecurityApplication {
 					//.and().csrf()
 					//.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		}
-	}
-
-	// ************ Session ************
-	@Bean
-	HeaderHttpSessionStrategy sessionStrategy() {
-		return new HeaderHttpSessionStrategy();
 	}
 
 	// ************ App ************
