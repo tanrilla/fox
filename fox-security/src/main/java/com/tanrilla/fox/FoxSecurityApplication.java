@@ -24,6 +24,7 @@ import java.util.UUID;
 @SpringBootApplication
 public class FoxSecurityApplication {
 
+	// ************ Controllers ************
 	@RequestMapping("/user")
 	public Principal user(Principal user) {
 		return user;
@@ -57,6 +58,7 @@ public class FoxSecurityApplication {
 		return Collections.singletonMap("token", session.getId());
 	}
 
+	// ************ Security ************
 	@Configuration
 	protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		@Override
@@ -86,11 +88,13 @@ public class FoxSecurityApplication {
 		}
 	}
 
+	// ************ Session ************
 	@Bean
 	HeaderHttpSessionStrategy sessionStrategy() {
 		return new HeaderHttpSessionStrategy();
 	}
 
+	// ************ App ************
 	public static void main(String[] args) {
 		SpringApplication.run(FoxSecurityApplication.class, args);
 	}
