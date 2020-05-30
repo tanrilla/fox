@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -27,8 +29,16 @@ public class FoxSecurityApplication {
 		return user;
 	}
 
+	@RequestMapping("/resourceAdmin")
+	public Map<String,Object> resourceAdmin() {
+		Map<String,Object> model = new HashMap<>();
+		model.put("id", UUID.randomUUID().toString());
+		model.put("content", "Hello World, I'm a protected resource (only readable for admins)");
+		return model;
+	}
+
 	@RequestMapping("/resource")
-	public Map<String,Object> home() {
+	public Map<String,Object> resource() {
 		Map<String,Object> model = new HashMap<>();
 		model.put("id", UUID.randomUUID().toString());
 		model.put("content", "Hello World, I'm a protected resource");
@@ -50,6 +60,15 @@ public class FoxSecurityApplication {
 	@Configuration
 	protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.inMemoryAuthentication()
+					.withUser("user").password("{noop}password").roles("USER")
+					.and()
+					.withUser("admin").password("{noop}password").roles("USER", "ADMIN");
+
+		}
+
+		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 					.cors()
@@ -57,11 +76,13 @@ public class FoxSecurityApplication {
 					.httpBasic()
 					.and()
 					.authorizeRequests()
-					.antMatchers("/public").permitAll()
-					.anyRequest().authenticated()
+					.antMatchers(HttpMethod.GET, "/public").permitAll()
+					.antMatchers(HttpMethod.GET, "/resourceAdmin").hasRole("ADMIN")
+					.antMatchers(HttpMethod.GET, "/resource").hasRole("USER")
+					.anyRequest().authenticated();
 					// TODO Study CSRF
-					.and().csrf()
-					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());;
+					//.and().csrf()
+					//.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		}
 	}
 
